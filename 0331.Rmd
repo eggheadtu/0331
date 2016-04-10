@@ -149,5 +149,7 @@ kable(head(sharesPage[order(sharesPage$shares_count.y, decreasing = T), c("share
 
 ## 粉絲留言頻率(加分題)
 
+```
 post_id <- totalPage$id
 getPost(post_id, token, n.comments = 許金蓮)
+```
