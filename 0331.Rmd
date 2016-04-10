@@ -9,11 +9,11 @@ output: github_document
 
 首先先安裝Rfacebook的packages，並放入library。接著將自己的token放上，開始將朱立倫從2016-01-01到做報告當天(2016-04-10)的所有文章都加進totalPage中。
 
-在for迴圈中，是先暫存每一天的文章在tempPage中，再個別放到totalpage中統一彙整，算出總文章數。
+在for迴圈中，是先暫存每五天的文章在tempPage中，再個別放到totalpage中統一彙整，算出總文章數。
 ```
 install.packages("Rfacebook")
 library(Rfacebook)
-token<-'CAACEdEose0cBACVinv09FTIOoFJUcdZBcZBcBbvqSj2dOvVNBT3U903ePDi8y5V5YyqIwZARxR1kBBhP9FMAQT3vKmQ4rbzf2po7V1LOsW63lyDVGREuvKx2ldgeKGRt3Go0gvqCIA1py06GKcMrgmPnq9vnpc4Haa6xZCa1vNLXomlk6UuXyQwr3ZBZCDjFDRuNdawc58PwZDZD'
+token<-'CAACEdEose0cBAHCFPq4yw6EsBNV1PakfEFXS20y3B6ajBpL0cIDZAvZAeZAbqZAQ8mHlx5ZBKBwpBodbXE5AHBdGifmahVdruJ6nClKp5Bnn7881RFKkIQhIhM3gSsQHwgcvyEWkycIGFF3VvoQ079HIpl7XJ0ZCZC7wzdj2p4QebOfkyAhAcbchge2YdyHPmMQG1yfcgMUmBzsjqjFX2crvXZAgWtw7wygZD'
 
 FBData = GET(paste0("https://graph.facebook.com/v2.5/DoctorKoWJ?fields=posts&access_token=",token))
 names(FBData)
@@ -39,7 +39,7 @@ totalPage$weekdays <- weekdays(as.Date(totalPage$dateDay))
 Posts <- totalPage$id
 PostCount <- aggregate(Posts~dateDay,totalPage,length)
 library(knitr)
-kable(head(PostCount[order(PostCount$Posts,decreasing = T),]))
+kable(head(PostCount[order(PostCount$Posts,decreasing = T),],10))
 ```
 |   |dateDay    | Posts|
 |:--|:----------|-----:|
@@ -49,6 +49,10 @@ kable(head(PostCount[order(PostCount$Posts,decreasing = T),]))
 |15 |2016-01-15 |     5|
 |65 |2016-03-20 |     4|
 |1  |2016-01-01 |     3|
+|2  |2016-01-02 |     3|
+|4  |2016-01-04 |     3|
+|5  |2016-01-05 |     3|
+|6  |2016-01-06 |     3|
 
 2016年1月12號到15號的發文數就占了前四名，很大原因是16號的總統選舉，16號之後就閉嘴當然是是選輸回家哭哭。3月20號大概就是心血來潮的發表文章，或是在26號前的國民黨黨主席選舉前刷個存在感。至於1月1號就是發表文章討個新年喜氣，告訴大家他是新北市市長，只是暫時不見而已。
 
@@ -65,7 +69,21 @@ for(i in 1:nrow(PostCount)){
   }
 }
 likesPage <- totalPageLikes[order(totalPageLikes$likes_count.y, decreasing = T), c("likes_count.y","likes_count.x","dateDay","message")]
+kable(head(likesPage[order(likesPage$likes_count.y, decreasing = T), c("likes_count.y","dateDay")],10))
 ```
+|   | likes_count.y|dateDay    |
+|:--|-------------:|:----------|
+|53 |       83386.0|2016-01-16 |
+|54 |       83386.0|2016-01-16 |
+|75 |       57639.0|2016-02-06 |
+|23 |       52729.5|2016-01-09 |
+|24 |       52729.5|2016-01-09 |
+|48 |       49404.8|2016-01-15 |
+|49 |       49404.8|2016-01-15 |
+|50 |       49404.8|2016-01-15 |
+|51 |       49404.8|2016-01-15 |
+|52 |       49404.8|2016-01-15 |
+
 2016年1月16號當天的文章平均讚數最多，當然是因為國民黨輸了大家都很開心跑去按讚，其中的敗選宣言也是這份報告的時間區間中讚數最多的。2月6號發生了南台大地震，敗選的新北市市長出來刷個好像有在做事的形象，就騙了不少讚。1月9號就One Taiwan的大遊行，很多人看到圖片就按讚，因為是國民黨少數能看的時候。
 
 
@@ -82,7 +100,21 @@ for(i in 1:nrow(PostCount)){
   }
 }
 commentsPage <- totalPagecomments[order(totalPagecomments$comments_count.y, decreasing = T), c("comments_count.y","comments_count.x","dateDay","message")]
+kable(head(commentsPage[order(commentsPage$comments_count.y, decreasing = T), c("comments_count.y","dateDay")],10))
 ```
+|   | comments_count.y|dateDay    |
+|:--|----------------:|:----------|
+|53 |          10605.5|2016-01-16 |
+|54 |          10605.5|2016-01-16 |
+|48 |           7843.8|2016-01-15 |
+|49 |           7843.8|2016-01-15 |
+|50 |           7843.8|2016-01-15 |
+|51 |           7843.8|2016-01-15 |
+|52 |           7843.8|2016-01-15 |
+|55 |           3629.0|2016-01-18 |
+|23 |           1883.0|2016-01-09 |
+|24 |           1883.0|2016-01-09 |
+
 2016年1月16號留言數最多，就國民黨輸大家開心去留言，然後藍蛆一起取暖。15號次多，選舉前一天黨工出馬。18號就辭黨主席，打了屁話，藍蛆抱在一起哭。
 
 ## 每日shares數分析
@@ -98,6 +130,24 @@ for(i in 1:nrow(PostCount)){
   }
 }
 sharesPage <- totalPageshares[order(totalPageshares$shares_count.y, decreasing = T), c("shares_count.y","shares_count.x","dateDay","message")]
+kable(head(sharesPage[order(sharesPage$shares_count.y, decreasing = T), c("shares_count.y","dateDay")],10))
 ```
+|   | shares_count.y|dateDay    |
+|:--|--------------:|:----------|
+|48 |         2342.6|2016-01-15 |
+|49 |         2342.6|2016-01-15 |
+|50 |         2342.6|2016-01-15 |
+|51 |         2342.6|2016-01-15 |
+|52 |         2342.6|2016-01-15 |
+|1  |         1521.0|2016-01-01 |
+|2  |         1521.0|2016-01-01 |
+|3  |         1521.0|2016-01-01 |
+|53 |         1363.5|2016-01-16 |
+|54 |         1363.5|2016-01-16 |
+
 2016年1月15號分享數最多，其中以周子瑜事件最多，因為是少數跟國民黨無關的文章，所以藍蛆比較有臉分享。1號分享次多，就跨年大家開心。16號就國民黨敗選，爽分享。
 
+## 粉絲留言頻率(加分題)
+
+post_id <- totalPage$id
+getPost(post_id, token, n.comments = 許金蓮)
