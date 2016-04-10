@@ -1,15 +1,15 @@
 ---
-title: "Facebook�����Τ��R�]���R�M���G���߭ۡ^"
+title: "Facebook粉絲團分析（分析專頁：朱立倫）"
 output: github_document
 ---
 
-���R���߭ۡA��Ƥ��R�϶���2016/01/01��2016/04/10�A���i����Ū����ơB�o��ơB�g�ơB�d���ơB���ɼơC
+分析朱立倫，資料分析區間為2016/01/01至2016/04/10，報告分為讀取資料、發文數、讚數、留言數、分享數。
 
-## Ū�����۪߭����
+## 讀取朱立倫的資料
 
-�������w��Rfacebook��packages�A�é�Jlibrary�C���۱N�ۤv��token��W�A�}�l�N���߭۱q2016-01-01�찵���i����(2016-04-10)���Ҧ��峹���[�itotalPage���C
+首先先安裝Rfacebook的packages，並放入library。接著將自己的token放上，開始將朱立倫從2016-01-01到做報告當天(2016-04-10)的所有文章都加進totalPage中。
 
-�bfor�j�餤�A�O���Ȧs�C���Ѫ��峹�btempPage���A�A�ӧO���totalpage���Τ@�J��A��X�`�峹�ơC
+在for迴圈中，是先暫存每五天的文章在tempPage中，再個別放到totalpage中統一彙整，算出總文章數。
 ```
 install.packages("Rfacebook")
 library(Rfacebook)
@@ -27,11 +27,11 @@ for(i in 1:(length(DateVectorStr)-1)){
 }
 nrow(totalPage)
 ```
-���߭۱q2016/01/01��2016/04/10�@�o�F134�g�峹
+朱立倫從2016/01/01至2016/04/10共發了134篇文章
 
-## �C��o��Ƥ��R
+## 每日發文數分析
 
-�]��Facebook�O���ɶ����覡���S���A�Ҧp�_������~���Ĥ@�Ѥ峹�A�o���ɶ�(created_time)��"2016-01-01T00:48:51+0000"�A���F��K��ƪ��غc�A�t�s�O���ɶ�(dateTime)�B�O�����(dateDay)�ΰO���P��(weekdays)�A���O�ٲ���"2016-01-01 00:48:51"�B"2016-01-01 00:48:51"�B"2016-01-01"��"�P����"�C�̫�C�X�o���峹�e�X�W�h������A�}�l���R�C
+因為Facebook記錄時間的方式較特殊，例如朱立倫今年的第一天文章，發表時間(created_time)為"2016-01-01T00:48:51+0000"，為了方便資料的建構，另存記錄時間(dateTime)、記錄日期(dateDay)及記錄星期(weekdays)，分別省略成"2016-01-01 00:48:51"、"2016-01-01 00:48:51"、"2016-01-01"及"星期五"。最後列出發表文章前幾名多的日期，開始分析。
 ```
 totalPage$dateTime <- as.POSIXct(totalPage$created_time, format = "%Y-%m-%dT%H:%M:%S+0000", tz = "GMT")
 totalPage$dateDay <- format(totalPage$dateTime, "%Y-%m-%d", tz = "Asia/Taipei")
@@ -54,13 +54,13 @@ kable(head(PostCount[order(PostCount$Posts,decreasing = T),],10))
 |5  |2016-01-05 |     3|
 |6  |2016-01-06 |     3|
 
-2016�~1��12����15�����o��ƴN�e�F�e�|�W�A�ܤj��]�O16�����`�ο��|�A16������N���L���M�O�O���^�a�����C3��20���j���N�O�ߦ�Ӽ骺�o���峹�A�άO�b26���e��������ҥD�u���|�e��Ӧs�b�P�C�ܩ�1��1���N�O�o���峹�Q�ӷs�~�߮�A�i�D�j�a�L�O�s�_�������A�u�O�Ȯɤ����Ӥw�C
+2016年1月12號到15號的發文數就占了前四名，很大原因是16號的總統選舉，16號之後就閉嘴當然是是選輸回家哭哭。3月20號大概就是心血來潮的發表文章，或是在26號前的國民黨黨主席選舉前刷個存在感。至於1月1號就是發表文章討個新年喜氣，告訴大家他是新北市市長，只是暫時不見而已。
 
-## �C��likes�Ƥ��R
+## 每日likes數分析
 
-�]���C�ѥi��|�X����@�g�峹�A�]���n����X�C�Ѥ峹�g�ƪ������A�s��likes�C�A�N�����g�Ʃ�i�C�@�C���A�ç�Ҧ���Ʀs�itotalPageLikes�C�̫�N��ƫ��ӥ����g�ƥѤj��p�ƦC�A�]�P�@�Ѫ������g�ƥ��w�@�ˡA�]���i�N�P�@�Ѥ������P�峹�ñƦb�@�_��ܡF���X�C�g�峹�����ѥ����g�ơB�ӽg�g�ơB����Τ��e�A�A�s�ilikesPage�A���۴N�i�H�}�l���R�g�ƫe�X�W������C
+因為每天可能會出不止一篇文章，因此要先算出每天文章讚數的平均，存到likes。再將平均讚數放進每一列中，並把所有資料存進totalPageLikes。最後將資料按照平均讚數由大到小排列，因同一天的平均讚數必定一樣，因此可將同一天中的不同文章並排在一起顯示；拿出每篇文章的當天平均讚數、該篇讚數、日期及內容，再存進likesPage，接著就可以開始分析讚數前幾名的日期。
 
-�bfor�j�餤�A�O�N���Ѫ������g�Ʀs�J�C�@�C��Ƥ��A�~�j�鬰�`�ѼơA���j�鬰���Ѧ��X�g�峹�C
+在for迴圈中，是將當天的平均讚數存入每一列資料中，外迴圈為總天數，內迴圈為當天有幾篇文章。
 ```
 likes <- aggregate(likes_count~dateDay,totalPage,mean)
 for(i in 1:nrow(PostCount)){
@@ -84,14 +84,14 @@ kable(head(likesPage[order(likesPage$likes_count.y, decreasing = T), c("likes_co
 |51 |       49404.8|2016-01-15 |
 |52 |       49404.8|2016-01-15 |
 
-2016�~1��16�����Ѫ��峹�����g�Ƴ̦h�A���M�O�]������ҿ�F�j�a���ܶ}�߶]�h���g�A�䤤���ѿ�Ũ��]�O�o�����i���ɶ��϶����g�Ƴ̦h���C2��6���o�ͤF�n�x�j�a�_�A�ѿ諸�s�_�������X�Ө�Ӧn�����b���ƪ��ζH�A�N�F�F�����g�C1��9���NOne Taiwan���j�C��A�ܦh�H�ݨ�Ϥ��N���g�A�]���O����ҤּƯ�ݪ��ɭԡC
+2016年1月16號當天的文章平均讚數最多，當然是因為國民黨輸了大家都很開心跑去按讚，其中的敗選宣言也是這份報告的時間區間中讚數最多的。2月6號發生了南台大地震，敗選的新北市市長出來刷個好像有在做事的形象，就騙了不少讚。1月9號就One Taiwan的大遊行，很多人看到圖片就按讚，因為是國民黨少數能看的時候。
 
 
-## �C��comments�Ƥ��R
+## 每日comments數分析
 
-�]���C�ѥi��|�X����@�g�峹�A�]���n����X�C�Ѥ峹�d���ƪ������A�s��comments�C�A�N�����d���Ʃ�i�C�@�C���A�ç�Ҧ���Ʀs�itotalPageComments�C�̫�N��ƫ��ӥ����d���ƥѤj��p�ƦC�A�]�P�@�Ѫ������d���ƥ��w�@�ˡA�]���i�N�P�@�Ѥ������P�峹�ñƦb�@�_��ܡF���X�C�g�峹�����ѥ����d���ơB�ӽg�d���ơB����Τ��e�A�A�s�icommentsPage�A���۴N�i�H�}�l���R�d���ƫe�X�W������C
+因為每天可能會出不止一篇文章，因此要先算出每天文章留言數的平均，存到comments。再將平均留言數放進每一列中，並把所有資料存進totalPageComments。最後將資料按照平均留言數由大到小排列，因同一天的平均留言數必定一樣，因此可將同一天中的不同文章並排在一起顯示；拿出每篇文章的當天平均留言數、該篇留言數、日期及內容，再存進commentsPage，接著就可以開始分析留言數前幾名的日期。
 
-�bfor�j�餤�A�O�N���Ѫ������d���Ʀs�J�C�@�C��Ƥ��A�~�j�鬰�`�ѼơA���j�鬰���Ѧ��X�g�峹�C
+在for迴圈中，是將當天的平均留言數存入每一列資料中，外迴圈為總天數，內迴圈為當天有幾篇文章。
 ```
 comments <- aggregate(comments_count~dateDay,totalPage,mean)
 for(i in 1:nrow(PostCount)){
@@ -115,13 +115,13 @@ kable(head(commentsPage[order(commentsPage$comments_count.y, decreasing = T), c(
 |23 |           1883.0|2016-01-09 |
 |24 |           1883.0|2016-01-09 |
 
-2016�~1��16���d���Ƴ̦h�A�N����ҿ�j�a�}�ߥh�d���A�M���ųI�@�_���x�C15�����h�A���|�e�@���Ҥu�X���C18���N���ҥD�u�A���F���ܡA�ųI��b�@�_���C
+2016年1月16號留言數最多，就國民黨輸大家開心去留言，然後藍蛆一起取暖。15號次多，選舉前一天黨工出馬。18號就辭黨主席，打了屁話，藍蛆抱在一起哭。
 
-## �C��shares�Ƥ��R
+## 每日shares數分析
 
-�]���C�ѥi��|�X����@�g�峹�A�]���n����X�C�Ѥ峹���ɼƪ������A�s��shares�C�A�N�������ɼƩ�i�C�@�C���A�ç�Ҧ���Ʀs�itotalPageShares�C�̫�N��ƫ��ӥ������ɼƥѤj��p�ƦC�A�]�P�@�Ѫ��������ɼƥ��w�@�ˡA�]���i�N�P�@�Ѥ������P�峹�ñƦb�@�_��ܡF���X�C�g�峹�����ѥ������ɼơB�ӽg���ɼơB����Τ��e�A�A�s�isharesPage�A���۴N�i�H�}�l���R���ɼƫe�X�W������C
+因為每天可能會出不止一篇文章，因此要先算出每天文章分享數的平均，存到shares。再將平均分享數放進每一列中，並把所有資料存進totalPageShares。最後將資料按照平均分享數由大到小排列，因同一天的平均分享數必定一樣，因此可將同一天中的不同文章並排在一起顯示；拿出每篇文章的當天平均分享數、該篇分享數、日期及內容，再存進sharesPage，接著就可以開始分析分享數前幾名的日期。
 
-�bfor�j�餤�A�O�N���Ѫ��������ɼƦs�J�C�@�C��Ƥ��A�~�j�鬰�`�ѼơA���j�鬰���Ѧ��X�g�峹�C
+在for迴圈中，是將當天的平均分享數存入每一列資料中，外迴圈為總天數，內迴圈為當天有幾篇文章。
 ```
 shares <- aggregate(shares_count~dateDay,totalPage,mean)
 for(i in 1:nrow(PostCount)){
@@ -145,11 +145,11 @@ kable(head(sharesPage[order(sharesPage$shares_count.y, decreasing = T), c("share
 |53 |         1363.5|2016-01-16 |
 |54 |         1363.5|2016-01-16 |
 
-2016�~1��15�����ɼƳ̦h�A�䤤�H�P�l��ƥ�̦h�A�]���O�ּƸ����ҵL�����峹�A�ҥH�ųI������y���ɡC1�����ɦ��h�A�N��~�j�a�}�ߡC16���N����ұѿ�A�n���ɡC
+2016年1月15號分享數最多，其中以周子瑜事件最多，因為是少數跟國民黨無關的文章，所以藍蛆比較有臉分享。1號分享次多，就跨年大家開心。16號就國民黨敗選，爽分享。
 
-## �����d���W�v(�[���D)
+## 粉絲留言頻率(加分題)
 
 ```
 post_id <- totalPage$id
-getPost(post_id, token, n.comments = �\����)
+getPost(post_id, token, n.comments = 許金蓮)
 ```
