@@ -34,13 +34,23 @@ NameCount<-aggregate(postID~commentName,totalComment,FUN=length)
 head(NameCount[order(NameCount$postID,decreasing=T),],10)
 ```
 commentName postID
+
 101   Ruby Huang      5
+
 107 Shih-Wen Kuo      5
+
 230       ªL¨Î¿²      5
+
 323       ´¿´º°x      5
+
 40     Grace Lee      4
+
 244       ªLÀA³¹      4
+
 262       °KÖö®x      4
+
 276       ±ç®a»È      4
+
 366       ¹Q½å©¾      4
+
 3   Alice Rogers      3
