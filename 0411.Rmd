@@ -1,0 +1,46 @@
+---
+title: "Facebook粉絲留言頻率"
+output: github_document
+---
+
+## 讀取朱立倫的資料
+```
+install.packages("Rfacebook")
+library(Rfacebook)
+token<-'CAACEdEose0cBAEZCgRgCJZCMZAD0Sz8Yn0kbK8ZAVVrCDCJUGApfhQts0jIQCzuxWf6fGG9hwPlYNQPVRQNps4DPwb0ZChZBbBLns4sVIQaZBZBmtEjPu2OiJTKzvEJdlGDWZAr4EZC8gRwv62UuN8Axx5FXaUCjShxpouoxW6kFeQAWomzV83t5K6ZBu4PVfzfsuSfZCeaZC3BBJtwZDZD'
+FBData = GET(paste0("https://graph.facebook.com/v2.5/DoctorKoWJ?fields=posts&access_token=",token))
+names(FBData)
+
+totalPage <- NULL
+lastDate <- Sys.Date()
+DateVectorStr <- as.character(seq(as.Date("2016-01-01"),lastDate,by="5 days"))
+for(i in 1:(length(DateVectorStr)-1)){
+  tempPage <- getPage("llchu", token, since = DateVectorStr[i],until = DateVectorStr[i+1])
+  totalPage <- rbind(totalPage,tempPage)
+}
+nrow(totalPage)
+```
+## 粉絲留言頻率(加分題)
+```
+totalComment<-NULL
+for(i in 1:10)
+post<-getPost(totalPage$id[i],token,)
+tempComment<-cbind(post$post$id,post$comments$from_name)
+totalComment<-rbind(totalComment,tempComment)
+
+totalComment<-data.frame(totalComment)
+colnames(totalComment)<-c("postID","commentName")
+NameCount<-aggregate(postID~commentName,totalComment,FUN=length)
+head(NameCount[order(NameCount$postID,decreasing=T),],10)
+```
+commentName postID
+101   Ruby Huang      5
+107 Shih-Wen Kuo      5
+230       林佳臻      5
+323       曾景釗      5
+40     Grace Lee      4
+244       林錦章      4
+262       袁翊庭      4
+276       梁家銀      4
+366       鄒賢忠      4
+3   Alice Rogers      3
